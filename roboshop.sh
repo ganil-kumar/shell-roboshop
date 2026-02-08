@@ -1,10 +1,12 @@
 #!/bin/bash
 
-SG_ID="sg-02da904f56f6ac0ca" # replace with my ID
+SG_ID="sg-02da904f56f6ac0ca" # replace with ID
 AMI_ID="ami-0220d79f3f480ecf5" 
+Zone_ID="Z0178053H1TTSPYHM852"
+DOMAIN_NAME="akviklabs.online"
 
 for instance in $@
-do 
+do
     INSTANCE_ID=$( aws ec2 run-instances \
     --image-id $AMI_ID \
     --instance-type "t3.micro" \
@@ -20,12 +22,42 @@ do
             --query 'Reservations[].Instances[].PublicIpAddress' \
             --output text
         )
-    else 
+        RECORD_NAME="$DOMAIN_NAME" # akviklabs.online
+    else
         IP=$(
             aws ec2 describe-instances \
             --instance-ids $INSTANCE_ID \
             --query 'Reservations[].Instances[].PrivateIpAddress' \
             --output text
         )
+        RECORD_NAME="$instance.$DOMAIN_NAME" # mongodb.akviklabs.online
     fi
+
+    echo "IP Address: $IP"
+
+    aws route53 change-resource-record-sets \
+    --hosted-zone-id $ZONE_ID \
+    --change-batch '
+    {
+        "Comment": "Updating record",
+        "Changes": [
+            {
+            "Action": "UPSERT",
+            "ResourceRecordSet": {
+                "Name": "'$RECORD_NAME'",
+                "Type": "A",
+                "TTL": 1,
+                "ResourceRecords": [
+                {
+                    "Value": "'$IP'"
+                }
+                ]
+            }
+            }
+        ]
+    }
+    '
+
+    echo "record updated for $instance"
+
 done
