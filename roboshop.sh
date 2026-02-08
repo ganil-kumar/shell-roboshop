@@ -6,7 +6,7 @@ Zone_ID="Z0178053H1TTSPYHM852"
 DOMAIN_NAME="akviklabs.online"
 
 for instance in $@
-do
+do 
     INSTANCE_ID=$( aws ec2 run-instances \
     --image-id $AMI_ID \
     --instance-type "t3.micro" \
@@ -23,7 +23,7 @@ do
             --output text
         )
         RECORD_NAME="$DOMAIN_NAME" # akviklabs.online
-    else
+    else 
         IP=$(
             aws ec2 describe-instances \
             --instance-ids $INSTANCE_ID \
