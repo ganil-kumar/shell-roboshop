@@ -24,13 +24,13 @@ VALIDATE(){
     fi
 }
 
-cp 03-mongo.repo /etc/yum.repos.d/03-mongo.repo
-VALIDATE $? "Copying 03-Mongo Repo" 
+cp 02-mongo.repo /etc/yum.repos.d/02-mongo.repo
+VALIDATE $? "Copying 02-Mongo Repo" 
 
-dnf install mongodb-org -y 
+dnf install mongodb-org -y &>>$LOGS_FILE
 VALIDATE $? "Installing MongoDB server"
 
-systemctl enable mongod 
+systemctl enable mongod &>>$LOGS_FILE
 VALIDATE $? "Enable MongoDB"
 
 systemctl start mongod
