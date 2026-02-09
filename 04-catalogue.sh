@@ -72,8 +72,8 @@ systemctl enable catalogue &>>$LOGS_FILE
 systemctl start catalogue
 VALIDATE $? "Starting and enabling catalogue"
 
-cp $SCRIPT_DIR/02-mongodb.repo /etc/yum.repos.d/mongo.repo
-dnf install mongodb-mongosh -y
+cp $SCRIPT_DIR/02-mongo.repo /etc/yum.repos.d/mongo.repo
+dnf install mongodb-mongosh -y &>>$LOGS_FILE
 
 INDEX=$(mongosh --host $MONGODB_HOST --quiet --eval 'db.getMongo().indexOf("catalogue")')
 
